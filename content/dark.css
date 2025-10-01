@@ -1,0 +1,155 @@
+/* Scoped dark mode for www.clzschoolplein.nl
+   Apply by adding the class `clz-dark-mode` to <html> or <body>.
+   This file focuses on backgrounds, borders, text colors, hover states,
+   and preserving the site's colored accents.
+*/
+
+.clz-dark-mode, .clz-dark-mode * {
+  transition: background-color 160ms linear, color 160ms linear, border-color 160ms linear;
+}
+
+/* Page background & default text */
+.clz-dark-mode html,
+.clz-dark-mode body {
+  background: #0b0d10 !important; /* near-black */
+  color: #d6d8db !important; /* light text */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Generic elements */
+.clz-dark-mode a { color: #7fb4ff !important; text-decoration: none; }
+.clz-dark-mode a:hover, .clz-dark-mode a:active { color: #a6d2ff !important; text-decoration: underline; }
+.clz-dark-mode img { opacity: 0.98; }
+.clz-dark-mode table, .clz-dark-mode th, .clz-dark-mode td { border-color: #2b2f33 !important; }
+
+/* Header area */
+.clz-dark-mode #SP_header>div#titleBar,
+.clz-dark-mode #SP_header .SP_headerLogin {
+  background: #0f1215 !important;
+  border-color: #23272b !important;
+  color: #e6e8ea !important;
+}
+
+.clz-dark-mode #SP_header h1 {
+  color: #e6e8ea !important;
+}
+
+/* Tiles and main buttons */
+.clz-dark-mode .SP_tile,
+.clz-dark-mode .SP_mainButton {
+  background: #0f1316 !important;
+  border-color: #2b2f33 !important;
+  color: #e6e8ea !important;
+  box-shadow: none !important;
+}
+
+.clz-dark-mode .SP_tile>h2 {
+  background: #115a8b !important; /* slightly darker stable blue */
+  color: #fff !important;
+}
+
+/* Hover states for tiles/buttons */
+.clz-dark-mode .SP_mainButton:hover,
+.clz-dark-mode .SP_tile:hover {
+  background: #162029 !important;
+}
+
+/* Scroll indicators (top/bottom overlays) */
+.clz-dark-mode .scrollIndicatorTop,
+.clz-dark-mode .scrollIndicatorBottom {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)) !important;
+  color: rgba(255,255,255,0.75) !important;
+}
+
+/* Generic list item hover */
+.clz-dark-mode li.calendarItem:hover,
+.clz-dark-mode li.mailItem:hover,
+.clz-dark-mode li.driveItem:hover,
+.clz-dark-mode li.classroomClass:hover {
+  background: rgba(255,255,255,0.03) !important;
+}
+
+/* Primary text areas inside list items */
+.clz-dark-mode .calendarItem .time,
+.clz-dark-mode .calendarItem .otherDate,
+.clz-dark-mode .calendarItem .title,
+.clz-dark-mode .mailItem .title,
+.clz-dark-mode .driveItem .title,
+.clz-dark-mode .classroomClass .name {
+  color: #d6d8db !important;
+}
+
+/* Muted / meta text */
+.clz-dark-mode .mailItem .fromWrapper,
+.clz-dark-mode .mailItem .timeWrapper,
+.clz-dark-mode .calendarItem .endTimeWrapper,
+.clz-dark-mode #mededelingen .mededeling .datum,
+.clz-dark-mode .classroomClass .section,
+.clz-dark-mode .classroomClass .invitation {
+  color: #9aa0a6 !important;
+}
+
+/* Notes - base & tinted note colors adjusted for dark bg */
+.clz-dark-mode .note {
+  background: #0f1316 !important;
+  border-color: #2b2f33 !important;
+  color: #e6e8ea !important;
+}
+
+.clz-dark-mode .note[color='1'] { background: #2a2410 !important; }
+.clz-dark-mode .note[color='2'] { background: #14222f !important; }
+.clz-dark-mode .note[color='3'] { background: #122616 !important; }
+.clz-dark-mode .note[color='4'] { background: #2b1a12 !important; }
+
+/* Switch controls */
+.clz-dark-mode .switch { background: transparent !important; border-color: #2b2f33 !important; }
+.clz-dark-mode .switch .switch_option { background-color: #131619 !important; color: #d6d8db !important; }
+.clz-dark-mode .switch .switch_option[active='true'] { background: #1f6f72 !important; color: #fff !important; }
+
+/* Message boxes */
+.clz-dark-mode #SP_message .message {
+  background: #0f1316 !important;
+  border-color: #2b2f33 !important;
+  color: #e6e8ea !important;
+}
+
+.clz-dark-mode #SP_message .message>div {
+  background: transparent !important;
+  color: #a9aeb1 !important;
+}
+
+/* Message type color accents (darker versions) */
+.clz-dark-mode #SP_message .message.messageType1>div { background-color: #274e24 !important; }
+.clz-dark-mode #SP_message .message.messageType2>div { background-color: #5a1b1b !important; }
+.clz-dark-mode #SP_message .message.messageType3>div { background-color: #574b11 !important; }
+
+/* Inputs / textareas inside notes */
+.clz-dark-mode .note textarea {
+  color: #e6e8ea !important;
+  background: transparent !important;
+  caret-color: #9fbfff !important;
+}
+
+/* Borders, outlines */
+.clz-dark-mode * { box-shadow: none !important; }
+.clz-dark-mode :not(svg) { outline-color: rgba(127,180,255,0.12) !important; }
+
+/* Keep important bright single-color accents readable on dark bg */
+.clz-dark-mode #mailButton #mailCount { color: #ff7b75 !important; font-weight: 700 !important; }
+
+/* Icon tweaks (for white/transparent icons) */
+.clz-dark-mode .SP_tile>h2 .icon,
+.clz-dark-mode span.drive,
+.clz-dark-mode span.classroom,
+.clz-dark-mode span.mail,
+.clz-dark-mode span.newmail {
+  filter: brightness(1.05) contrast(0.95);
+}
+
+/* Fallback: reduce any excessive bright backgrounds */
+.clz-dark-mode [style*="background:#fff"], .clz-dark-mode [style*="background: #fff"] {
+  background: rgba(255,255,255,0.02) !important;
+}
+
+/* End of dark.css */

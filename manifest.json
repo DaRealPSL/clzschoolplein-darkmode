@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "CLZ Schoolplein — Dark Mode",
+  "version": "1.0.0",
+  "permissions": ["storage"],
+  "host_permissions": ["*://www.clzschoolplein.nl/*"],
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    },
+    "default_title": "CLZ Dark Mode",
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.clzschoolplein.nl/*"],
+      "css": ["content/dark.css"],
+      "js": ["content/content_script.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
