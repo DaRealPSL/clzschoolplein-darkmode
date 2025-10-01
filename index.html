@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CLZ Dark Mode — Help</title>
+    <meta
+      name="description"
+      content="Help & instructions for the CLZ Schoolplein Dark Mode Chrome extension."
+    />
+    <style>
+      :root {
+        --bg: #0b1220;
+        --card: #0f1622;
+        --muted: #9aa5b1;
+        --accent: #1167a6;
+        --glass: rgba(255, 255, 255, 0.03);
+        --radius: 10px;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        background: linear-gradient(180deg, #06101a 0%, #08121b 100%);
+        color: #e6eef6;
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 48px auto;
+        padding: 28px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: var(--radius);
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+      }
+      header {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+      .logo {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--accent), #2aa6ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .logo svg {
+        width: 32px;
+        height: 32px;
+        fill: #fff;
+      }
+      h1 {
+        margin: 0;
+        font-size: 20px;
+      }
+      p.lead {
+        margin: 6px 0 0;
+        color: var(--muted);
+      }
+
+      section {
+        margin-top: 22px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 0 0 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 18px;
+      }
+      .card {
+        background: var(--card);
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+      }
+      pre {
+        background: #071018;
+        padding: 12px;
+        border-radius: 8px;
+        overflow: auto;
+        font-size: 13px;
+      }
+      code {
+        color: #b8e0ff;
+      }
+      ul {
+        margin: 8px 0 0 18px;
+      }
+      a.link {
+        color: #9ed1ff;
+        text-decoration: none;
+      }
+      footer {
+        margin-top: 22px;
+        font-size: 13px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .btn {
+        display: inline-block;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: linear-gradient(90deg, var(--accent), #2aa6ff);
+        color: #06232f;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      @media (max-width: 840px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .logo {
+          width: 52px;
+          height: 52px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap" role="main">
+      <header>
+        <div class="logo" aria-hidden>
+          <svg viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1>CLZ Dark Mode - Help & Instructions</h1>
+          <p class="lead">
+            A lightweight Chrome extension that applies a site-specific dark
+            theme to <strong>www.clzschoolplein.nl</strong>.
+          </p>
+        </div>
+      </header>
+
+      <section class="grid">
+        <article>
+          <div class="card">
+            <h2>Quick start</h2>
+            <ol>
+              <li>
+                Install the extension from the Chrome Web Store (or load
+                unpacked via <code>chrome://extensions</code> →
+                <em>Load unpacked</em>).
+              </li>
+              <li>
+                Open <strong>www.clzschoolplein.nl</strong>. The dark theme is
+                applied automatically by default.
+              </li>
+              <li>
+                Use the extension toolbar popup to toggle dark mode or reset the
+                stored preference.
+              </li>
+            </ol>
+
+            <h2 style="margin-top: 14px">Popup & settings</h2>
+            <p class="muted">
+              The popup stores a single preference (<code>clzDarkEnabled</code>)
+              in <code>chrome.storage.local</code>. Toggling the switch updates
+              the setting and notifies all open tabs on the site so the change
+              takes effect immediately.
+            </p>
+
+            <h2 style="margin-top: 14px">Troubleshooting</h2>
+            <ul>
+              <li>
+                If the popup shows the wrong state, try clicking
+                <strong>Reset</strong> and reopen the site.
+              </li>
+              <li>
+                Open Chrome DevTools on <em>clzschoolplein.nl</em> and check the
+                Console for errors from <code>content_script.js</code>.
+              </li>
+              <li>
+                Make sure the extension is enabled and the site URL matches
+                <code>https://www.clzschoolplein.nl/</code>.
+              </li>
+            </ul>
+
+            <h2 style="margin-top: 14px">Privacy</h2>
+            <p class="muted">
+              This extension runs locally in your browser. It only stores a
+              single boolean preference in <code>chrome.storage.local</code> and
+              does not collect or transmit personal data.
+            </p>
+          </div>
+
+          <div class="card" style="margin-top: 12px">
+            <h2>Developer notes</h2>
+            <p class="muted">Files included in the project:</p>
+            <ul>
+              <li><code>manifest.json</code> (MV3)</li>
+              <li>
+                <code>content/dark.css</code> (scoped, applied via
+                <code>clz-dark-mode</code>)
+              </li>
+              <li>
+                <code>content/content_script.js</code> (applies class & handles
+                messages)
+              </li>
+              <li>
+                <code>popup/popup.html</code>, <code>popup/popup.js</code>
+              </li>
+            </ul>
+
+            <h3 style="margin-top: 8px">Install locally</h3>
+            <pre><code>1. Open chrome://extensions/  
+2. Enable Developer mode  
+3. Click "Load unpacked" → select the extension folder</code></pre>
+          </div>
+        </article>
+
+        <aside>
+          <div class="card">
+            <h2>Quick actions</h2>
+            <p style="margin: 8px 0">
+              Open the source or download the latest package:
+            </p>
+            <p style="margin: 12px 0">
+              <a
+                class="btn"
+                href="https://github.com/DaRealPSL/clzschoolplein-darkmode"
+                target="_blank"
+                rel="noopener"
+                >View on GitHub</a
+              >
+            </p>
+
+            <h2 style="margin-top: 14px">Version</h2>
+            <p class="muted">
+              v1.0 - last updated:
+              <time datetime="2025-10-01">Oct 1, 2025</time>
+            </p>
+
+            <h2 style="margin-top: 14px">Contact</h2>
+            <p class="muted">
+              Questions or feedback? Open an issue on the GitHub repo or email:
+              <a class="link" href="mailto:147304@clz.nl">147304@clz.nl</a>
+            </p>
+          </div>
+
+          <div class="card" style="margin-top: 12px">
+            <h2>Changelog</h2>
+            <ul class="muted">
+              <li>
+                v1.0 - Initial release: scoped dark CSS + popup toggle + storage
+                persistence.
+              </li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <footer>
+        <div class="muted">
+          Made for CLZ Schoolplein - super lightweight.
+        </div>
+        <div>
+          <a
+            class="link"
+            href="https://github.com/DaRealPSL/clzschoolplein-darkmode"
+            target="_blank"
+            rel="noopener"
+            >GitHub</a
+          >
+        </div>
+      </footer>
+    </main>
+  </body>
+</html>
