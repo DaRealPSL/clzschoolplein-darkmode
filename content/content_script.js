@@ -1,10 +1,3 @@
-/* What this script does:
-   - Apply the 'clz-dark-mode' class as early as possible to reduce FOUC
-   - Read persisted preference from chrome.storage.local (key: 'clzDarkEnabled')
-   - Listen for runtime messages to toggle or set the dark mode
-   - Listen for storage changes to respond to tab/popup updates
-*/
-
 /* Constants & helpers */
 const ROOT_CLASS = 'clz-dark-mode';
 const STORAGE_KEY = 'clzDarkEnabled';
