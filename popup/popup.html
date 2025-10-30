@@ -3,42 +3,179 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CLZ Dark Mode</title>
+  <title>CLZ Dark Mode — Customize</title>
   <style>
-    :root { font-family: Arial, system-ui, -apple-system, "Segoe UI", Roboto; color-scheme: light; }
-    body { width: 260px; padding: 12px; margin: 0; background: #fff; color: #111; }
-    .header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-    .title { font-size:16px; font-weight:600; }
-    .desc { font-size:12px; color:#666; margin-top:6px; }
-    .toggle-row { display:flex; align-items:center; justify-content:space-between; margin-top:14px; }
-    .btn { padding:8px 12px; border-radius:6px; border:1px solid #ddd; background:#f6f7f8; cursor:pointer; font-weight:600; }
-    .btn:active { transform:translateY(1px); }
-    .state { font-size:13px; color:#333; }
-    .small { font-size:12px; color:#666; }
-    .link { display:block; margin-top:12px; font-size:12px; color:#2a6fd6; text-decoration:none; }
-    .spinner { width:16px; height:16px; display:inline-block; vertical-align:middle; }
+    :root{--bg:#f8fafc;--panel:#ffffff;--border:#e2e8f0;--muted:#64748b;--text:#0f172a;--text-secondary:#475569;--accent:#0ea5e9;--accent-hover:#0284c7;--accent-light:#e0f2fe;--success:#10b981;--success-light:#ecfdf5;--success-dark:#065f46;--success-border:#bbf7d0;--warning:#f59e0b;--warning-light:#fff7ed;--warning-dark:#92400e;--warning-border:#fee7c4;--danger:#ef4444;--danger-light:#fee2e2;--shadow-sm:0 1px 2px 0 rgb(0 0 0 / 0.05);--shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--shadow-lg:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--radius:10px;--radius-lg:12px;--transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text)}
+    body{width:340px;padding:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    .card{background:var(--panel);border-radius:var(--radius-lg);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden}
+    .header{display:flex;gap:12px;align-items:center;padding:16px;border-bottom:1px solid var(--border);background:linear-gradient(to bottom, var(--panel), var(--bg))}
+    .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#0ea5e9 0%,#06b6d4 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(14,165,233,0.25);transition:var(--transition)}
+    .logo:hover{transform:scale(1.05);box-shadow:0 6px 16px rgba(14,165,233,0.35)}
+    .logo svg{width:24px;height:24px;fill:#fff}
+    .title{display:flex;flex-direction:column;gap:4px;flex:1}
+    .title .name{font-weight:700;font-size:16px;color:var(--text);letter-spacing:-0.01em}
+    .title .subtitle{font-size:12px;color:var(--muted);line-height:1.4}
+    .content{padding:16px;border-bottom:1px solid var(--border)}
+    .toggle-section{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+    .toggle-info{display:flex;flex-direction:column;gap:2px}
+    .status{font-size:14px;font-weight:600;color:var(--text)}
+    .hint{font-size:12px;color:var(--muted);line-height:1.4}
+    .switch{position:relative;display:inline-block;width:52px;height:28px;background:var(--border);border-radius:14px;cursor:pointer;transition:var(--transition);border:2px solid transparent}
+    .switch:hover{background:#cbd5e1}
+    .switch:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .switch input{opacity:0;width:0;height:0;position:absolute}
+    .switch .knob{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:var(--transition);box-shadow:0 2px 4px rgba(0,0,0,0.2)}
+    .switch[aria-checked="true"]{background:var(--accent)}
+    .switch[aria-checked="true"]:hover{background:var(--accent-hover)}
+    .switch[aria-checked="true"] .knob{left:26px}
+    .presets{display:flex;gap:8px;margin-bottom:16px}
+    .preset-btn{flex:1;padding:8px 12px;border-radius:8px;border:2px solid var(--border);background:var(--panel);cursor:pointer;font-weight:600;font-size:13px;color:var(--text-secondary);transition:var(--transition)}
+    .preset-btn:hover{background:var(--bg);border-color:#cbd5e1}
+    .preset-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:var(--shadow-sm)}
+    .preset-btn.active:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+    .badge{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid transparent;font-weight:600;letter-spacing:0.01em;transition:var(--transition)}
+    .badge.ok{background:var(--success-light);color:var(--success-dark);border-color:var(--success-border)}
+    .badge.warn{background:var(--warning-light);color:var(--warning-dark);border-color:var(--warning-border)}
+    .controls{display:flex;flex-direction:column;gap:14px}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .row label{font-size:13px;font-weight:500;color:var(--text-secondary);min-width:90px}
+    .row input[type="color"]{width:48px;height:32px;border-radius:8px;border:2px solid var(--border);padding:2px;cursor:pointer;transition:var(--transition);background:var(--panel)}
+    .row input[type="color"]:hover{border-color:var(--accent)}
+    .row input[type="color"]::-webkit-color-swatch-wrapper{padding:0}
+    .row input[type="color"]::-webkit-color-swatch{border:none;border-radius:6px}
+    .row input[type="range"]{-webkit-appearance:none;width:140px;height:6px;border-radius:3px;background:var(--border);outline:none;transition:var(--transition)}
+    .row input[type="range"]:hover{background:#cbd5e1}
+    .row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.15);transition:var(--transition)}
+    .row input[type="range"]::-webkit-slider-thumb:hover{background:var(--accent-hover);transform:scale(1.1)}
+    .row input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:none;box-shadow:0 2px 4px rgba(0,0,0,0.15)}
+    .row input[type="checkbox"]{width:20px;height:20px;border-radius:4px;border:2px solid var(--border);cursor:pointer;transition:var(--transition);accent-color:var(--accent)}
+    .row input[type="checkbox"]:hover{border-color:var(--accent)}
+    .row select{padding:6px 10px;border-radius:8px;border:2px solid var(--border);background:var(--panel);font-size:13px;color:var(--text);cursor:pointer;transition:var(--transition);font-weight:500}
+    .row select:hover{border-color:#cbd5e1}
+    .row select:focus{outline:none;border-color:var(--accent)}
+    .small{font-size:12px;color:var(--muted);font-weight:500;min-width:32px;text-align:right}
+    .import-section{padding:14px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-top:16px}
+    .section-title{font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;letter-spacing:0.02em}
+    textarea{width:100%;height:72px;border-radius:8px;padding:10px;font-family:'SF Mono', Monaco, 'Cascadia Code', monospace;font-size:11px;border:2px solid var(--border);background:var(--panel);color:var(--text);resize:vertical;transition:var(--transition);line-height:1.5}
+    textarea:hover{border-color:#cbd5e1}
+    textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+    textarea::placeholder{color:var(--muted)}
+    .btn-row{display:flex;gap:8px;margin-top:8px}
+    .btn{flex:1;padding:10px 14px;border-radius:8px;font-weight:600;font-size:13px;border:none;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;justify-content:center;letter-spacing:-0.01em}
+    .btn:active{transform:scale(0.98)}
+    .btn.primary{background:var(--accent);color:#fff;box-shadow:var(--shadow-sm);border:2px solid var(--accent)}
+    .btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover);box-shadow:var(--shadow)}
+    .btn.secondary{background:var(--bg);color:var(--text-secondary);border:2px solid var(--border)}
+    .btn.secondary:hover{background:var(--panel);border-color:#cbd5e1}
+    .btn.ghost{background:transparent;color:var(--muted);border:2px solid var(--border)}
+    .btn.ghost:hover{background:var(--bg);color:var(--text-secondary)}
+    .btn.reset{color:var(--danger);border-color:var(--danger);background:var(--danger-light)}
+    .btn.reset:hover{background:var(--danger);color:#fff}
+    .actions{display:flex;gap:8px;padding:14px;border-top:1px solid var(--border);background:var(--bg)}
+    .footer{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);border-top:1px solid var(--border);background:var(--bg)}
+    .link{color:var(--accent);text-decoration:none;font-weight:600;font-size:12px;transition:var(--transition)}
+    .link:hover{color:var(--accent-hover);text-decoration:underline}
+    @media (max-width:360px){body{width:320px;padding:12px}.row input[type="range"]{width:120px}}
   </style>
 </head>
 <body>
-  <div class="header">
-    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden>
-      <path fill="#115a8b" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
-    </svg>
-    <div>
-      <div class="title">CLZ Dark Mode</div>
-      <div class="small">Site-specific dark theme for clzschoolplein.nl</div>
+  <div class="card" role="dialog" aria-label="CLZ Dark Mode">
+    <div class="header">
+      <div class="logo" aria-hidden>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="#fff"></path></svg>
+      </div>
+      <div class="title">
+        <div class="name">CLZ Dark Mode</div>
+        <div class="subtitle">Site-only theme for clzschoolplein.nl</div>
+      </div>
+    </div>
+
+    <div class="content" aria-live="polite">
+      <div class="toggle-section">
+        <div class="toggle-info">
+          <div id="stateLabel" class="status">Loading…</div>
+          <div id="hint" class="hint">Toggle dark mode for the site</div>
+        </div>
+        <div>
+          <label id="switchRoot" class="switch" role="switch" aria-checked="false" tabindex="0">
+            <input id="toggleInput" type="checkbox" aria-hidden />
+            <span class="knob" aria-hidden></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="presets" aria-hidden="false">
+        <button class="preset-btn" id="presetDark" data-preset="dark">Dark</button>
+        <button class="preset-btn" id="presetContrast" data-preset="contrast">High Contrast</button>
+        <button class="preset-btn" id="presetWarm" data-preset="warm">Warm</button>
+      </div>
+
+      <div class="controls">
+        <div class="row">
+          <label for="accent">Accent</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="accent" type="color" value="#115a8b" aria-label="Accent color">
+            <span id="contrastBadge" class="badge" aria-hidden>…</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <label for="darkness">Background</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="darkness" type="range" min="0.6" max="1" step="0.01" value="0.92" aria-label="Background darkness">
+            <span id="darknessVal" class="small">0.92</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <label for="fontsize">Font size</label>
+          <select id="fontsize" aria-label="Font size">
+            <option value="0.9">Small</option>
+            <option value="1" selected>Default</option>
+            <option value="1.15">Large</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="imageDim">Image dim</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="imageDim" type="range" min="0.4" max="1" step="0.05" value="0.85" aria-label="Image brightness">
+            <span id="imageDimVal" class="small">0.85</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <label for="desaturate">Desaturate</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="desaturate" type="checkbox" aria-label="Desaturate images">
+            <span class="small">Reduce color on images</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="import-section">
+        <div class="section-title">Export / Import</div>
+        <textarea id="jsonArea" placeholder='Paste theme JSON here to import or press Export to copy.'></textarea>
+        <div class="btn-row">
+          <button id="exportBtn" class="btn secondary">Export</button>
+          <button id="importBtn" class="btn secondary">Import</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="previewBtn" class="btn secondary">Preview</button>
+      <button id="applyBtn" class="btn primary">Apply & Save</button>
+      <button id="resetBtn" class="btn ghost reset">Reset</button>
+    </div>
+
+    <div class="footer">
+      <div>v1.1</div>
+      <a id="helpLink" class="link" href="https://darealpsl.github.io/clzschoolplein-darkmode/" target="_blank" rel="noopener noreferrer">Help</a>
     </div>
   </div>
-
-  <div class="toggle-row" role="region" aria-live="polite">
-    <div>
-      <div class="state" id="stateLabel">Loading…</div>
-      <div class="desc small" id="hint">Toggle dark mode for the site. Persists across pages.</div>
-    </div>
-    <button id="toggleBtn" class="btn" aria-pressed="false">Toggle</button>
-  </div>
-
-  <a id="openSite" class="link" target="_blank" rel="https://www.clzschoolplein.nl/">Open www.clzschoolplein.nl</a>
 
   <script src="popup.js"></script>
 </body>
