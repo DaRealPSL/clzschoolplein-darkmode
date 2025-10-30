@@ -1,135 +1,233 @@
-/* Constants & helpers */
-const ROOT_CLASS = 'clz-dark-mode';
-const STORAGE_KEY = 'clzDarkEnabled';
+const ROOT_CLASS = "clz-dark-mode";
+const ENABLE_KEY = "clzDarkEnabled"; // boolean
+const THEME_KEY = "clzTheme"; // object: { accent, bgDarkness, fontSizeScale }
+const OVERRIDE_STYLE_ID = "clz-theme-overrides";
 
+// Get root element
+function rootEl() {
+  return document.documentElement || document.body || document;
+}
 function applyClass(enabled) {
+  const el = rootEl();
+  if (!el) return;
   try {
-    const el = document.documentElement || document.body || document;
-    if (!el) return;
-    if (enabled) {
-      el.classList.add(ROOT_CLASS);
-    } else {
-      el.classList.remove(ROOT_CLASS);
-    }
-  } catch (err) {
-    // Let's try to not crash the page
-    console.error('clz-dark-mode: applyClass error', err);
+    if (enabled) el.classList.add(ROOT_CLASS);
+    else el.classList.remove(ROOT_CLASS);
+  } catch (e) {
+    console.error("clz: applyClass error", e);
   }
 }
 
-/* Early apply to reduce flash.
-   We'll add the class immediately by default so dark styles appear during initial paint
-   Later we'll read the stored preference and correct if needed
-*/
+// Build CSS variable block
+function buildCssVars(theme) {
+  const accent = theme && theme.accent ? theme.accent : "#115a8b";
+  const bgRaw = theme && typeof theme.bgDarkness === "number" ? theme.bgDarkness : 0.92;
+  const scaleRaw = theme && typeof theme.fontSizeScale === "number" ? theme.fontSizeScale : 1;
+  const imgBrightnessRaw = theme && typeof theme.imageDim === "number" ? theme.imageDim : 0.85;
+  const imgDesatRaw =
+    theme && typeof theme.desaturateImages === "number"
+      ? theme.desaturateImages
+      : theme && theme.desaturateImages
+      ? 0.5
+      : 0;
+  const bg = Math.min(1, Math.max(0.3, Number(bgRaw) || 0.92));
+  const scale = Math.min(1.5, Math.max(0.8, Number(scaleRaw) || 1));
+  const imgBrightness = Math.min(
+    1,
+    Math.max(0.3, Number(imgBrightnessRaw) || 0.85)
+  );
+  const imgDesat = Math.min(1, Math.max(0, Number(imgDesatRaw) || 0));
+
+  return `:root{--clz-accent:${accent};--clz-bg-opa:${bg};--clz-font-scale:${scale};--clz-img-brightness:${imgBrightness};--clz-img-desat:${imgDesat};}`;
+}
+
+function createOrUpdateOverrideStyle(theme) {
+  try {
+    const css = buildCssVars(theme);
+    let s = document.getElementById(OVERRIDE_STYLE_ID);
+    if (!s) {
+      s = document.createElement("style");
+      s.id = OVERRIDE_STYLE_ID;
+      s.type = "text/css";
+      s.appendChild(document.createTextNode(css));
+      const parent = document.head || document.documentElement;
+      parent.appendChild(s);
+    } else {
+      if ("textContent" in s) s.textContent = css;
+      else {
+        while (s.firstChild) s.removeChild(s.firstChild);
+        s.appendChild(document.createTextNode(css));
+      }
+    }
+  } catch (err) {
+    console.error("clz-theme: failed to inject overrides", err);
+  }
+}
+
+function removeOverrideStyle() {
+  try {
+    const s = document.getElementById(OVERRIDE_STYLE_ID);
+    if (s) s.remove();
+  } catch (e) {}
+}
+
+/* Early apply to reduce white flash */
 (function earlyApply() {
-  // Default: enable dark mode to reduce white flash
-  // If the user previously set enabled=false, we'll remove it shortly after reading storage
   applyClass(true);
 })();
 
-/* Read stored preference (async). If stored value is explicitly false, disable.
-   If no preference stored (undefined), we keep the optimistic enable.
-*/
-function readStoredPreferenceAndApply() {
-  if (typeof chrome === 'undefined' || !chrome.storage) {
-    // Not available or not running in extension context; keep optimistic default.
-    return;
-  }
-
+function readAndApplyStored() {
   try {
-    chrome.storage.local.get([STORAGE_KEY], (items) => {
-      // If the key exists and is strictly false, disable. Otherwise keep enabled.
-      if (chrome.runtime.lastError) {
-        // Storage might not be available; leave as-is.
-        return;
-      }
-      if (Object.prototype.hasOwnProperty.call(items, STORAGE_KEY)) {
-        const enabled = !!items[STORAGE_KEY];
-        applyClass(enabled);
-      }
-      // If preference not set, do nothing (keep optimistic enabled).
+    if (
+      typeof chrome === "undefined" ||
+      !chrome.storage ||
+      !chrome.storage.local
+    )
+      return;
+    chrome.storage.local.get([ENABLE_KEY, THEME_KEY], (items) => {
+      if (chrome.runtime && chrome.runtime.lastError) return;
+      if (Object.prototype.hasOwnProperty.call(items, ENABLE_KEY))
+        applyClass(!!items[ENABLE_KEY]);
+      const theme = items[THEME_KEY] || null;
+      if (theme) createOrUpdateOverrideStyle(theme);
+      else removeOverrideStyle();
     });
   } catch (err) {
-    // ignore
-    console.error('clz-dark-mode: storage read error', err);
+    console.error("clz-theme: read error", err);
   }
 }
 
-/* Message listener: allows popup or background to toggle or set dark mode.
+/* Runtime message handler
    Supports:
-     { action: 'toggle-dark' }               -> toggles current class
-     { action: 'set-dark', enabled: true }   -> explicitly set enabled/disabled
-     { action: 'get-dark' }                  -> respond with { enabled: boolean }
+   - { action: 'toggle-dark' }
+   - { action: 'set-dark', enabled: true/false }
+   - { action: 'get-dark' } => { enabled: boolean }
+   - { action: 'apply-theme', theme: {...} }
+   - { action: 'get-theme' } => { theme: {...} }
 */
-function handleRuntimeMessage(message, sender, sendResponse) {
+function handleMessage(message, sender, sendResponse) {
+  if (!message || !message.action) return false;
   try {
-    if (!message || !message.action) return;
-    if (message.action === 'toggle-dark') {
-      const isEnabled = document.documentElement.classList.contains(ROOT_CLASS);
-      const newState = !isEnabled;
-      applyClass(newState);
-      // Persist new state
-      try {
-        if (chrome && chrome.storage && chrome.storage.local) {
-          chrome.storage.local.set({ [STORAGE_KEY]: newState }, () => {
-            // ignore errors
-            if (chrome.runtime.lastError) {
-              // no-op
-            }
-          });
-        }
-      } catch (err) {
-        // ignore
-      }
-      sendResponse && sendResponse({ toggled: true, enabled: newState });
-    } else if (message.action === 'set-dark') {
+    if (message.action === "set-dark") {
       const enabled = !!message.enabled;
       applyClass(enabled);
       try {
-        chrome && chrome.storage && chrome.storage.local && chrome.storage.local.set({ [STORAGE_KEY]: enabled });
-      } catch (err) { /* ignore */ }
+        chrome &&
+          chrome.storage &&
+          chrome.storage.local &&
+          chrome.storage.local.set({ [ENABLE_KEY]: enabled });
+      } catch (e) {}
       sendResponse && sendResponse({ set: true, enabled });
-    } else if (message.action === 'get-dark') {
-      const enabled = document.documentElement.classList.contains(ROOT_CLASS);
-      sendResponse && sendResponse({ enabled });
+      return true;
+    }
+    if (message.action === "apply-theme") {
+      const theme = message.theme || null;
+      if (theme) {
+        createOrUpdateOverrideStyle(theme);
+        try {
+          chrome &&
+            chrome.storage &&
+            chrome.storage.local &&
+            chrome.storage.local.set({ [THEME_KEY]: theme });
+        } catch (e) {}
+      } else {
+        removeOverrideStyle();
+        try {
+          chrome &&
+            chrome.storage &&
+            chrome.storage.local &&
+            chrome.storage.local.remove([THEME_KEY]);
+        } catch (e) {}
+      }
+      sendResponse && sendResponse({ applied: true });
+      return true;
+    }
+    if (message.action === "get-theme") {
+      try {
+        chrome.storage.local.get([THEME_KEY], (items) => {
+          sendResponse && sendResponse({ theme: items[THEME_KEY] || null });
+        });
+        return true;
+      } catch (e) {
+        sendResponse && sendResponse({ theme: null });
+        return false;
+      }
     }
   } catch (err) {
-    console.error('clz-dark-mode: message handler error', err);
+    console.error("clz-theme: message handler error", err);
+    sendResponse && sendResponse({ error: String(err) });
   }
-  // Indicate we will send a response asynchronously if needed.
-  return true;
+  return false;
 }
 
-/* Storage change listener: respond to changes made in other tabs/popups */
-function handleStorageChange(changes, areaName) {
-  if (areaName !== 'local' || !changes || !changes[STORAGE_KEY]) return;
-  const newVal = changes[STORAGE_KEY].newValue;
-  applyClass(!!newVal);
+// Message + storage listeners
+if (
+  typeof chrome !== "undefined" &&
+  chrome.runtime &&
+  chrome.runtime.onMessage
+) {
+  chrome.runtime.onMessage.addListener((m, s, r) => handleMessage(m, s, r));
 }
-
-/* Attach listeners (if chrome.* is available) */
-if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
-  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    const maybeAsync = handleRuntimeMessage(msg, sender, sendResponse);
-    return maybeAsync;
+if (
+  typeof chrome !== "undefined" &&
+  chrome.storage &&
+  chrome.storage.onChanged
+) {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "local" || !changes) return;
+    if (changes[ENABLE_KEY]) applyClass(!!changes[ENABLE_KEY].newValue);
+    if (changes[THEME_KEY]) {
+      const newTheme = changes[THEME_KEY].newValue || null;
+      if (newTheme) createOrUpdateOverrideStyle(newTheme);
+      else removeOverrideStyle();
+    }
   });
 }
 
-if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
-  chrome.storage.onChanged.addListener(handleStorageChange);
-}
+// Apply stored values now
+readAndApplyStored();
 
-/* Finally, read stored preference and apply */
-readStoredPreferenceAndApply();
-
-/* Expose a small global for debugging */
+/* Expose small debug API */
 try {
-  window.__clzDarkMode = {
-    enable() { applyClass(true); try { chrome && chrome.storage && chrome.storage.local && chrome.storage.local.set({ [STORAGE_KEY]: true }); } catch (e) {} },
-    disable() { applyClass(false); try { chrome && chrome.storage && chrome.storage.local && chrome.storage.local.set({ [STORAGE_KEY]: false }); } catch (e) {} },
-    toggle() { const cur = document.documentElement.classList.contains(ROOT_CLASS); this[ cur ? 'disable' : 'enable' ](); },
-    isEnabled() { return document.documentElement.classList.contains(ROOT_CLASS); }
+  window.__clzTheme = {
+    apply(t) {
+      createOrUpdateOverrideStyle(t);
+      try {
+        chrome &&
+          chrome.storage &&
+          chrome.storage.local &&
+          chrome.storage.local.set({ [THEME_KEY]: t });
+      } catch (e) {}
+    },
+    remove() {
+      removeOverrideStyle();
+      try {
+        chrome &&
+          chrome.storage &&
+          chrome.storage.local &&
+          chrome.storage.local.remove([THEME_KEY]);
+      } catch (e) {}
+    },
+    enable() {
+      applyClass(true);
+      try {
+        chrome &&
+          chrome.storage &&
+          chrome.storage.local &&
+          chrome.storage.local.set({ [ENABLE_KEY]: true });
+      } catch (e) {}
+    },
+    disable() {
+      applyClass(false);
+      try {
+        chrome &&
+          chrome.storage &&
+          chrome.storage.local &&
+          chrome.storage.local.set({ [ENABLE_KEY]: false });
+      } catch (e) {}
+    },
+    isEnabled() {
+      return document.documentElement.classList.contains(ROOT_CLASS);
+    },
   };
-} catch (err) {
-  // ignore
-}
+} catch (e) {}
