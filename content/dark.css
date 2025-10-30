@@ -1,8 +1,8 @@
-/* Scoped dark mode for www.clzschoolplein.nl
-   Apply by adding the class `clz-dark-mode` to <html> or <body>.
-   This file focuses on backgrounds, borders, text colors, hover states,
-   and preserving the site's colored accents.
-*/
+:root {
+  --clz-accent: #115a8b;
+  --clz-bg-opa: 0.92; /* 0..1, where 1 = fully opaque near-black */
+  --clz-font-scale: 1;
+}
 
 .clz-dark-mode, .clz-dark-mode * {
   transition: background-color 160ms linear, color 160ms linear, border-color 160ms linear;
@@ -11,16 +11,17 @@
 /* Page background & default text */
 .clz-dark-mode html,
 .clz-dark-mode body {
-  background: #0b0d10 !important; /* near-black */
-  color: #d6d8db !important; /* light text */
+  background: #0b0d10 !important;
+  color: #d6d8db !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: calc(13px * var(--clz-font-scale, 1)) !important;
 }
 
 /* Generic elements */
-.clz-dark-mode a { color: #7fb4ff !important; text-decoration: none; }
+.clz-dark-mode a { color: var(--clz-accent, #7fb4ff) !important; text-decoration: none; }
 .clz-dark-mode a:hover, .clz-dark-mode a:active { color: #a6d2ff !important; text-decoration: underline; }
-.clz-dark-mode img { opacity: 0.98; }
+.clz-dark-mode img { opacity: 0.98; filter: brightness(var(--clz-img-brightness, 0.85)) grayscale(var(--clz-img-desat, 0)); transition: filter .18s linear; }
 .clz-dark-mode table, .clz-dark-mode th, .clz-dark-mode td { border-color: #2b2f33 !important; }
 
 /* Header area */
@@ -45,8 +46,15 @@
 }
 
 .clz-dark-mode .SP_tile>h2 {
-  background: #115a8b !important; /* slightly darker stable blue */
+  /* allow override if var provided */
+  background: var(--clz-accent, #115a8b) !important;
   color: #fff !important;
+}
+
+.clz-dark-mode .SP_tile>h2 .icon,
+.clz-dark-mode .mailItem .icon,
+.clz-dark-mode .driveItem .icon {
+  filter: brightness(1.02) contrast(0.98);
 }
 
 /* Hover states for tiles/buttons */
@@ -119,7 +127,7 @@
   color: #a9aeb1 !important;
 }
 
-/* Message type color accents (darker versions) */
+/* Message type color accents */
 .clz-dark-mode #SP_message .message.messageType1>div { background-color: #274e24 !important; }
 .clz-dark-mode #SP_message .message.messageType2>div { background-color: #5a1b1b !important; }
 .clz-dark-mode #SP_message .message.messageType3>div { background-color: #574b11 !important; }
@@ -131,7 +139,7 @@
   caret-color: #9fbfff !important;
 }
 
-/* Borders, outlines */
+/* Borders & outlines */
 .clz-dark-mode * { box-shadow: none !important; }
 .clz-dark-mode :not(svg) { outline-color: rgba(127,180,255,0.12) !important; }
 
@@ -147,9 +155,7 @@
   filter: brightness(1.05) contrast(0.95);
 }
 
-/* Fallback: reduce any excessive bright backgrounds */
+/* Reduce any excessive bright backgrounds */
 .clz-dark-mode [style*="background:#fff"], .clz-dark-mode [style*="background: #fff"] {
   background: rgba(255,255,255,0.02) !important;
 }
-
-/* End of dark.css */
