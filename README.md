@@ -1,7 +1,5 @@
 # CLZ Schoolplein Dark Mode
 
-Een Google Chrome-extensie die dark mode inschakelt voor de CLZ **Schoolplein** webpagina. Deze extensie bevat meerdere presets, een contrast-checker en beeldinstellingen om de leesbaarheid te verbeteren. (Bron: de repositorypagina). :contentReference[oaicite:0]{index=0}
-
 ---
 
 ## Features
@@ -9,7 +7,7 @@ Een Google Chrome-extensie die dark mode inschakelt voor de CLZ **Schoolplein** 
 - Voorinstellingen (presets) voor snelle instellingen.
 - Contrast-checker om tekst/achtergrond verhouding te controleren.
 - Beeldinstellingen (bijv. afbeeldingen dimmen of aanpassen).
-- Eenvoudige popup UI voor snelle bediening. :contentReference[oaicite:1]{index=1}
+- Eenvoudige popup UI voor snelle bediening.
 
 ---
 
@@ -61,3 +59,4 @@ Laatste release: **CLZ Dark Mode v1.2** — *Presets, Contrastchecker & Beeldins
 ## Contact
 
 Voor vragen of feedback: gebruik de **Issues** sectie van de GitHub-repository. ([GitHub][2])
+
